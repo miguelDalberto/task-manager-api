@@ -27,7 +27,7 @@ router.get('/users', async (req, res) => {
 
 router.get('/users/:id', async ({ params }, res) => {
   const _id = params.id
-  if(_id.length < 12)return res.status(400).send('Invalid ID.')
+  if(_id.length < 12)return res.status(400).send({ error: 'Invalid ID.' })
 
   try {
     const user = await User.findById(_id)
@@ -45,10 +45,16 @@ router.get('/users/:id', async ({ params }, res) => {
 router.patch('/users/:id', async ({ params, body }, res) => {
   const { id } = params
   if(id.length < 12)return res.status(400).send('Invalid ID.')
+  const updates = Object.keys(body)
+  const allowedOperations = ['name', 'email', 'password', 'age']
+  const isValidOperation = updates.every((update) => allowedOperations.includes(update))
+  if(!isValidOperation)return res.status(400).send({ error: 'Invalid updates.' })
 
   try {
-    const user = await User.findByIdAndUpdate(_id, body, { new: true, runValidators: true })
+    const user = await User.findById(id)
+    updates.forEach((update) => user[update] = body[update])
 
+    await user.save()
     user ?
       res.send(user)
     :
