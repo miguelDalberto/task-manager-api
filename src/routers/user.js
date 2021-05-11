@@ -45,6 +45,7 @@ router.get('/users/:id', async ({ params }, res) => {
 router.patch('/users/:id', async ({ params, body }, res) => {
   const { id } = params
   if(id.length < 12)return res.status(400).send('Invalid ID.')
+  
   const updates = Object.keys(body)
   const allowedOperations = ['name', 'email', 'password', 'age']
   const isValidOperation = updates.every((update) => allowedOperations.includes(update))
