@@ -1,5 +1,7 @@
 const { Router } = require('express')
-const User = require('../models/user.js')
+const { isValidObjectId } = require('mongoose')
+const User = require('../models/user')
+const auth = require('../middleware/auth')
 const router = new Router()
 
 router.post('/users', async ({ body }, res) => {
@@ -11,7 +13,6 @@ router.post('/users', async ({ body }, res) => {
     const token = await user.generateAuthToken()
     res.status(201).send({ user, token })
   } catch (err) {
-    console.log(err)
     res.status(400).send(err)
   }
 })
@@ -29,20 +30,31 @@ router.post('/users/login', async ({ body }, res) => {
   }
 })
 
-router.get('/users', async (req, res) => {
-
+router.post('/users/logout', auth, async (req, res) => {
   try {
-    const users = await User.find({})
-    res.status(200).send(users)
+    req.user.tokens = req.user.tokens.filter((token) => token.token !== req.token)
+    await req.user.save()
+    res.send()
   } catch (err) {
-    console.log(err)
     res.status(500).send()
   }
 })
 
+router.post('/users/logoutAll', auth, async (req, res) => {
+  try {
+    req.user.tokens = []
+    await req.user.save()
+    res.send()
+  } catch (err) {
+    res.status(500).send()
+  }
+})
+
+router.get('/users/me', auth, async (req, res) => res.send(req.user))
+
 router.get('/users/:id', async ({ params }, res) => {
   const _id = params.id
-  if(_id.length < 12)return res.status(400).send({ error: 'Invalid ID.' })
+  if(!isValidObjectId(_id))return res.status(400).send({ error: 'Invalid ID.' })
 
   try {
     const user = await User.findById(_id)
@@ -59,7 +71,7 @@ router.get('/users/:id', async ({ params }, res) => {
 
 router.patch('/users/:id', async ({ params, body }, res) => {
   const { id } = params
-  if(id.length < 12)return res.status(400).send('Invalid ID.')
+  if(!isValidObjectId(id))return res.status(400).send('Invalid ID.')
   
   const updates = Object.keys(body)
   const allowedOperations = ['name', 'email', 'password', 'age']
@@ -83,7 +95,7 @@ router.patch('/users/:id', async ({ params, body }, res) => {
 
 router.delete('/users/:id', async ({ params }, res) => {
   const { id } = params
-  if(id.length < 12)return res.status(400).send('Invalid ID.')
+  if(!isValidObjectId(id))return res.status(400).send('Invalid ID.')
 
   try {
     const user = await User.findByIdAndDelete(id)
