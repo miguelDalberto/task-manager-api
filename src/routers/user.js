@@ -51,23 +51,6 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 
 router.get('/users/me', auth, async (req, res) => res.send(req.user))
 
-router.get('/users/:id', async ({ params }, res) => {
-  const _id = params.id
-  if(!isValidObjectId(_id))return res.status(400).send({ error: 'Invalid ID.' })
-
-  try {
-    const user = await User.findById(_id)
-    
-    user ?
-      res.send(user)
-    :
-      res.status(404).send()
-  } catch (err) {
-    console.log(err)
-    res.status(500).send()
-  }
-})
-
 router.patch('/users/:id', async ({ params, body }, res) => {
   const { id } = params
   if(!isValidObjectId(id))return res.status(400).send('Invalid ID.')
