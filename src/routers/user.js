@@ -75,17 +75,10 @@ router.patch('/users/:id', async ({ params, body }, res) => {
   }
 })
 
-router.delete('/users/:id', async ({ params }, res) => {
-  const { id } = params
-  if(!isValidObjectId(id))return res.status(400).send('Invalid ID.')
-
+router.delete('/users/me', auth, async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(id)
-
-    user ?
-      res.send(user)
-    :
-      res.status(404).send()
+    await req.user.remove()
+    res.send(req.user)
   } catch (err) {
     console.log(err)
     res.status(500).send()
