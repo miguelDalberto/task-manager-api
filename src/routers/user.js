@@ -51,24 +51,17 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 
 router.get('/users/me', auth, async (req, res) => res.send(req.user))
 
-router.patch('/users/:id', async ({ params, body }, res) => {
-  const { id } = params
-  if(!isValidObjectId(id))return res.status(400).send('Invalid ID.')
-  
+router.patch('/users/me', auth, async ({ body, user }, res) => {
   const updates = Object.keys(body)
   const allowedOperations = ['name', 'email', 'password', 'age']
   const isValidOperation = updates.every((update) => allowedOperations.includes(update))
   if(!isValidOperation)return res.status(400).send({ error: 'Invalid updates.' })
 
   try {
-    const user = await User.findById(id)
     updates.forEach((update) => user[update] = body[update])
 
     await user.save()
-    user ?
-      res.send(user)
-    :
-      res.status(404).send()
+    res.send(user)
   } catch (err) {
     console.log(err)
     res.status(400).send()
