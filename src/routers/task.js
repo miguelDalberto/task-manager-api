@@ -18,9 +18,15 @@ router.post('/tasks', auth, async ({ body, user }, res) => {
   }
 })
 
-router.get('/tasks', auth, async ({ user }, res) => {
+router.get('/tasks', auth, async ({ user, query }, res) => {
+  const match = {}
+  match.completed = query.completed === 'true' ? true : false
+  
   try {
-    await user.populate('tasks').execPopulate() 
+    await user.populate({
+      path: 'tasks',
+      match
+    }).execPopulate() 
     res.send(user.tasks)
   } catch (err) {
     console.log(err)
