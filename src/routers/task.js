@@ -20,9 +20,13 @@ router.post('/tasks', auth, async ({ body, user }, res) => {
 
 router.get('/tasks', auth, async ({ user, query }, res) => {
   const match = {}
-  const { skip, limit, completed } = query
+  const sort = {}
+  const { skip, limit, completed, sortBy } = query
   if(completed) {
     match.completed = completed === 'true'
+  }
+  if(sortBy) {
+    sort[sortBy.split('_')[0]] = sortBy.split('_')[1]
   }
   
   try {
@@ -31,7 +35,8 @@ router.get('/tasks', auth, async ({ user, query }, res) => {
       match,
       options: {
         limit: parseInt(limit),
-        skip: parseInt(skip)
+        skip: parseInt(skip),
+        sort
       }
     }).execPopulate() 
     res.send(user.tasks)
