@@ -20,12 +20,19 @@ router.post('/tasks', auth, async ({ body, user }, res) => {
 
 router.get('/tasks', auth, async ({ user, query }, res) => {
   const match = {}
-  match.completed = query.completed === 'true' ? true : false
+  const { skip, limit, completed } = query
+  if(completed) {
+    match.completed = completed === 'true'
+  }
   
   try {
     await user.populate({
       path: 'tasks',
-      match
+      match,
+      options: {
+        limit: parseInt(limit),
+        skip: parseInt(skip)
+      }
     }).execPopulate() 
     res.send(user.tasks)
   } catch (err) {
