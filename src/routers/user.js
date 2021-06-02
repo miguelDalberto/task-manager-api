@@ -97,4 +97,10 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async ({ file, us
   res.status(400).send({ error: err.message })
 })
 
+router.delete('/users/me/avatar', auth, async ({ user }, res) => {
+  user.avatar = undefined
+  await user.save()
+  res.send()
+})
+
 module.exports = router
