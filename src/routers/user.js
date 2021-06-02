@@ -1,6 +1,7 @@
 const { Router } = require('express')
 const { isValidObjectId, Error } = require('mongoose')
 const multer = require('multer')
+const sharp = require('sharp')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = new Router()
@@ -90,7 +91,9 @@ const upload = multer({
 })
 
 router.post('/users/me/avatar', auth, upload.single('avatar'), async ({ file, user }, res) => {
-  user.avatar = file.buffer
+  const buffer = await sharp(file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+
+  user.avatar = buffer
   await user.save()
   res.send()
 }, (err, req, res, next) => {
@@ -104,7 +107,7 @@ router.delete('/users/me/avatar', auth, async ({ user }, res) => {
 })
 
 router.get('/users/:id/avatar', async ({ params }, res) => {
-  if(!isValidObjectId(params.id))return res.status(400).send({ error: 'Invalid ID.' })
+  if(!isValidObjectId(params.id))return res.status(400).send()
   try {
     const user = await User.findById(params.id)
 
@@ -112,7 +115,7 @@ router.get('/users/:id/avatar', async ({ params }, res) => {
       throw new Error()
     }
 
-    res.set('Content-Type', 'image/jpg')
+    res.set('Content-Type', 'image/png')
     res.send(user.avatar)
   } catch (err) {
     res.status(404).send()
