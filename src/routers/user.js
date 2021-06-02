@@ -1,5 +1,6 @@
 const { Router } = require('express')
-const { isValidObjectId } = require('mongoose')
+const { isValidObjectId, Error } = require('mongoose')
+const multer = require('multer')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = new Router()
@@ -76,6 +77,24 @@ router.delete('/users/me', auth, async (req, res) => {
     console.log(err)
     res.status(500).send()
   }
+})
+
+const upload = multer({
+  limits: { fileSize: 1000000 },
+  fileFilter(req, file, cb) {
+    if(!file.originalname.match(/\.(jpeg|png|jpg)$/)) {
+      return cb(new Error('Invalid file type. Try jpeg, jpg or png.'))
+    }
+    return cb(null, true)
+  }
+})
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), async ({ file, user }, res) => {
+  user.avatar = file.buffer
+  await user.save()
+  res.send()
+}, (err, req, res, next) => {
+  res.status(400).send({ error: err.message })
 })
 
 module.exports = router
