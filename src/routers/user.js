@@ -103,4 +103,20 @@ router.delete('/users/me/avatar', auth, async ({ user }, res) => {
   res.send()
 })
 
+router.get('/users/:id/avatar', async ({ params }, res) => {
+  if(!isValidObjectId(params.id))return res.status(400).send({ error: 'Invalid ID.' })
+  try {
+    const user = await User.findById(params.id)
+
+    if(!user || !user.avatar){
+      throw new Error()
+    }
+
+    res.set('Content-Type', 'image/jpg')
+    res.send(user.avatar)
+  } catch (err) {
+    res.status(404).send()
+  }
+})
+
 module.exports = router
