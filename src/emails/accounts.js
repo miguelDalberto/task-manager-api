@@ -1,4 +1,3 @@
-require('dotenv').config();
 const apiKey = process.env.MAILGUN_API_KEY
 const domain = process.env.DOMAIN;
 

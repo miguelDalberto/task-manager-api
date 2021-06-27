@@ -1,5 +1,4 @@
 const express = require('express')
-require('dotenv').config()
 require('./db/mongoose')
 // import routers
 const userRouter = require('./routers/user')
