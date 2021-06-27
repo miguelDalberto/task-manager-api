@@ -5,16 +5,15 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "jest"
+    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js",
+    "test": "env-cmd -f ./config/test.env jest"
   },
   "author": "miguelDalberto",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "dotenv": "^10.0.0",
+    "env-cmd": "^10.1.0",
     "express": "^4.17.1",
-    "form-data": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
     "mailgun-js": "^0.6.7",
     "mongodb": "^3.6.6",
