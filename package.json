@@ -9,7 +9,7 @@
     "test": "env-cmd -f ./config/test.env jest"
   },
   "jest": {
-    "testEnviroment": "node"
+    "testEnvironment": "node"
   },
   "author": "miguelDalberto",
   "license": "ISC",
