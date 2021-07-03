@@ -60,7 +60,7 @@ router.patch('/users/me', auth, async ({ body, user }, res) => {
   const updates = Object.keys(body)
   const allowedOperations = ['name', 'email', 'password', 'age']
   const isValidOperation = updates.every((update) => allowedOperations.includes(update))
-  if(!isValidOperation)return res.status(400).send({ error: 'Invalid updates.' })
+  if(!isValidOperation)return res.status(401).send({ error: 'Invalid updates.' })
 
   try {
     updates.forEach((update) => user[update] = body[update])
