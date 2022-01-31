@@ -1,5 +1,3 @@
-const getTimestamp = () => new Date().toISOString()
-
 class Logger {
   constructor(deactivateLogger) {
     if (deactivateLogger) {
@@ -16,7 +14,6 @@ class Logger {
       } else {
         console.log(`[${this.getTimestamp()}] [${purpose}] [${namespace}] - ${message}`);
       }
-
     }
   }
 
