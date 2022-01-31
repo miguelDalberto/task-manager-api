@@ -1,32 +1,37 @@
 const getTimestamp = () => new Date().toISOString()
 
-const info = (namespace, message, object) => {
-  if (object) {
-    console.log(`[${getTimestamp()}] [INFO] [${namespace}] ${message}`, object)
-  } else {
-    console.log(`[${getTimestamp()}] [INFO] [${namespace}] ${message}`)
+class Logger {
+  constructor(deactivateLogger) {
+    if (deactivateLogger) {
+      this.lock = true;
+    }
   }
-}
-const warn = (namespace, message, object) => {
-  if (object) {
-    console.log(`[${getTimestamp()}] [WARN] [${namespace}] ${message}`, object)
-  } else {
-    console.log(`[${getTimestamp()}] [WARN] [${namespace}] ${message}`)
+
+  getTimestamp () { return new Date().toISOString() }
+
+  log (namespace, message, object, purpose) {
+    if (!this.lock) {
+      if (object) {
+        console.log(`[${this.getTimestamp()}] [${purpose}] [${namespace}] - ${message},`, object);
+      } else {
+        console.log(`[${this.getTimestamp()}] [${purpose}] [${namespace}] - ${message}`);
+      }
+
+    }
   }
-}
-const debug = (namespace, message, object) => {
-  if (object) {
-    console.log(`[${getTimestamp()}] [DEBUG] [${namespace}] ${message}`, object)
-  } else {
-    console.log(`[${getTimestamp()}] [DEBUG] [${namespace}] ${message}`)
+
+  info (namespace, msg, obj) {
+    this.log(namespace, msg, obj, 'INFO');
   }
-}
-const error = (namespace, message, object) => {
-  if (object) {
-    console.log(`[${getTimestamp()}] [ERROR] [${namespace}] ${message}`, object)
-  } else {
-    console.log(`[${getTimestamp()}] [ERROR] [${namespace}] ${message}`)
+  warn (namespace, msg, obj) {
+    this.log(namespace, msg, obj, 'WARN');
+  }
+  debug (namespace, msg, obj) {
+    this.log(namespace, msg, obj, 'DEBUG');
+  }
+  error (namespace, msg, obj) {
+    this.log(namespace, msg, obj, 'ERROR');
   }
 }
 
-module.exports = { info, warn, debug, error }
+module.exports = new Logger(process.env.DEACTIVATE_LOGGER);
