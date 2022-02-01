@@ -1,4 +1,6 @@
-## dependencies
+# dependencies
 node_modules/
-## env vars
+# env vars
 config/
+# personal scripts
+.pripts
